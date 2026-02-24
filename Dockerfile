@@ -7,7 +7,6 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     zip
 
-# 🔥 Tambahkan pdo_mysql
 RUN docker-php-ext-install zip pdo_mysql
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -18,6 +17,6 @@ COPY . .
 
 RUN composer install --no-dev --optimize-autoloader
 
-EXPOSE 8000
+EXPOSE 8080
 
-CMD php artisan serve --host=0.0.0.0 --port=$PORT
+CMD php -S 0.0.0.0:$PORT -t public
