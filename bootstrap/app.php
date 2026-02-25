@@ -11,13 +11,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+
         $middleware->validateCsrfTokens(except: [
             'route',
         ]);
 
-        $middleware->alias([
-            'apikey' => \App\Http\Middleware\ApiKeyMiddleware::class,
-        ]);
+        $middleware->append(\App\Http\Middleware\ForceCors::class);
+
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

@@ -246,46 +246,24 @@ function loadPlaces(){
         let type=document.getElementById("category").value;
         let radius=document.getElementById("radius").value;
 
-        fetch(`/places/nearby?latitude=${lat}&longitude=${lng}&type=${type}&radius=${radius}`)
-        .then(res=>res.json())
-        .then(data=>{
-
-            clearMarkers();
-            results.innerHTML="";
-            map.setView([lat,lng],14);
-
-            data.data.forEach(place=>{
-
-                let marker=L.marker([place.latitude,place.longitude])
-                .addTo(map)
-                .bindPopup(`
-                    <div class="popup-title">${place.name}</div>
-                    <div class="popup-distance">${place.distance_km} km dari kamu</div>
-                    <a class="popup-btn" target="_blank"
-                    href="https://www.google.com/maps/dir/?api=1&destination=${place.latitude},${place.longitude}">
-                    Navigasi
-                    </a>
-                `);
-
-                markers.push(marker);
-
-                let card=document.createElement("div");
-                card.className="result-card";
-                card.innerHTML=`
-                    <strong>${place.name}</strong><br>
-                    <small>${place.distance_km} km dari kamu</small>
-                `;
-
-                card.onclick=()=>{
-                    map.setView([place.latitude,place.longitude],16);
-                    marker.openPopup();
-                };
-
-                results.appendChild(card);
-            });
-
-        });
-
+        fetch(`https://aplikasi-rs-terdekat-production.up.railway.app/places/nearby?latitude=${lat}&longitude=${lng}&type=${type}&radius=${radius}`, {
+    headers: {
+        "X-API-KEY": "supersecretkey123"
+    }
+})
+.then(async res => {
+    console.log("STATUS:", res.status);
+    const text = await res.text();
+    console.log("RESPONSE:", text);
+    if (!res.ok) throw new Error(res.status);
+    return JSON.parse(text);
+})
+.then(data => {
+    console.log("DATA:", data);
+})
+.catch(err => {
+    console.error("ERROR:", err);
+});
     },function(){
         results.innerHTML="<div class='loading'>Izinkan akses lokasi.</div>";
     });
