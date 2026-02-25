@@ -12,14 +12,15 @@ class HospitalController extends Controller
         $request->validate([
             'latitude'  => 'required|numeric',
             'longitude' => 'required|numeric',
-            'type'      => 'required|string'
+            'type'      => 'required|string',
+            'radius'    => 'nullable|numeric|min:500|max:50000'
         ]);
 
         $lat  = $request->latitude;
         $lng  = $request->longitude;
         $type = $request->type;
 
-        $radius = 3000;
+        $radius = $request->radius ?? 3000;
 
         // Mapping kategori ke Overpass query
         $amenityMap = [

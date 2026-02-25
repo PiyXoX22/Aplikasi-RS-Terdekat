@@ -1,0 +1,68 @@
+{
+    "makanan": [
+      {
+        "id": 1,
+        "nama": "Rendang",
+        "asal_daerah": "Sumatera Barat",
+        "kategori": "Makanan Berat",
+        "bahan_utama": ["Daging Sapi", "Santan", "Cabai", "Rempah-rempah"],
+        "tingkat_kepedasan": 4
+      },
+      {
+        "id": 2,
+        "nama": "Gudeg",
+        "asal_daerah": "DI Yogyakarta",
+        "kategori": "Makanan Berat",
+        "bahan_utama": ["Nangka Muda", "Santan", "Gula Merah", "Telur"],
+        "tingkat_kemanisan": 4
+      },
+      {
+        "id": 3,
+        "nama": "Pempek",
+        "asal_daerah": "Sumatera Selatan",
+        "kategori": "Makanan Ringan",
+        "bahan_utama": ["Ikan", "Tepung Sagu", "Telur"],
+        "disajikan_dengan": "Cuko"
+      },
+      {
+        "id": 4,
+        "nama": "Sate Madura",
+        "asal_daerah": "Jawa Timur",
+        "kategori": "Makanan Berat",
+        "bahan_utama": ["Daging Ayam", "Kacang Tanah", "Kecap Manis"],
+        "tingkat_kepedasan": 3
+      },
+      {
+        "id": 5,
+        "nama": "Coto Makassar",
+        "asal_daerah": "Sulawesi Selatan",
+        "kategori": "Makanan Berat",
+        "bahan_utama": ["Daging Sapi", "Jeroan", "Kacang Tanah"],
+        "kuah": true
+      },
+      {
+        "id": 6,
+        "nama": "Papeda",
+        "asal_daerah": "Papua",
+        "kategori": "Makanan Berat",
+        "bahan_utama": ["Sagu"],
+        "tekstur": "Kental dan lengket"
+      },
+      {
+        "id": 7,
+        "nama": "Ayam Betutu",
+        "asal_daerah": "Bali",
+        "kategori": "Makanan Berat",
+        "bahan_utama": ["Ayam", "Bumbu Base Genep"],
+        "tingkat_kepedasan": 3
+      },
+      {
+        "id": 8,
+        "nama": "Kerak Telor",
+        "asal_daerah": "DKI Jakarta",
+        "kategori": "Makanan Tradisional",
+        "bahan_utama": ["Beras Ketan", "Telur Bebek", "Ebi"],
+        "disajikan_saat": "Festival atau acara budaya"
+      }
+    ]
+  }

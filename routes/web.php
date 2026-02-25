@@ -8,15 +8,24 @@ use App\Http\Controllers\Api\ServiceController;
 Route::get('/', function () {
     return view('welcome');
 });
-Route::get('/gtw', function () {
-    return view('gtw');
+Route::get('/map', function () {
+    return view('map');
 });
-Route::get('/gtau', function () {
-    return view('gtau');
+Route::get('/docs', function () {
+    return view('docs');
 });
-Route::get('/tugas', function () {
-    return view('tugas');
+// Route::get('/gtw', function () {
+//     return view('gtw');
+// });
+// Route::get('/gtau', function () {
+//     return view('gtau');
+// });
+// Route::get('/tugas', function () {
+//     return view('tugas');
+// });
+Route::middleware(['apikey','throttle:60,1'])->group(function () {
+
+    Route::get('/places/nearby', [HospitalController::class, 'nearby']);
+    Route::post('/route', [HospitalController::class, 'route']);
+
 });
-Route::get('/hospitals/nearby', [HospitalController::class, 'nearby']);
-Route::get('/places/nearby', [HospitalController::class, 'nearby']);
-Route::post('/route', [HospitalController::class, 'route']);
