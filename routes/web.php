@@ -23,9 +23,7 @@ Route::get('/docs', function () {
 // Route::get('/tugas', function () {
 //     return view('tugas');
 // });
-Route::middleware(['apikey','throttle:60,1'])->group(function () {
+Route::get('/hospitals/nearby', [HospitalController::class, 'nearby']);
+Route::get('/places/nearby', [HospitalController::class, 'nearby']);
+Route::post('/route', [HospitalController::class, 'route']);
 
-    Route::get('/places/nearby', [HospitalController::class, 'nearby']);
-    Route::post('/route', [HospitalController::class, 'route']);
-
-});
