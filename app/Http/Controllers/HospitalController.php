@@ -12,94 +12,99 @@ class HospitalController extends Controller
         $request->validate([
             'latitude'  => 'required|numeric',
             'longitude' => 'required|numeric',
+            'type'      => 'required|string'
         ]);
 
-        $lat = $request->latitude;
-        $lng = $request->longitude;
+        $lat  = $request->latitude;
+        $lng  = $request->longitude;
+        $type = $request->type;
 
-        $radius = 3000; // 10km
+        $radius = 3000;
+
+        // Mapping kategori ke Overpass query
+        $amenityMap = [
+            'hospital'   => 'amenity=hospital',
+            'restaurant' => 'amenity=restaurant',
+            'cafe'       => 'amenity=cafe',
+            'tourism'    => 'tourism=attraction',
+            'supermarket' => 'shop=supermarket',
+            'pharmacy'    => 'amenity=pharmacy',
+            'fuel'        => 'amenity=fuel'
+        ];
+
+        if (!isset($amenityMap[$type])) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Invalid type'
+            ]);
+        }
+
+        [$key, $value] = explode('=', $amenityMap[$type]);
 
         $overpassQuery = "
         [out:json][timeout:25];
         (
-          node[\"amenity\"=\"hospital\"](around:$radius,$lat,$lng);
-          way[\"amenity\"=\"hospital\"](around:$radius,$lat,$lng);
-          relation[\"amenity\"=\"hospital\"](around:$radius,$lat,$lng);
+          node[\"$key\"=\"$value\"](around:$radius,$lat,$lng);
+          way[\"$key\"=\"$value\"](around:$radius,$lat,$lng);
+          relation[\"$key\"=\"$value\"](around:$radius,$lat,$lng);
         );
         out center;
         ";
 
         $response = Http::timeout(60)
-        ->withHeaders([
-            'User-Agent' => 'RS-Terdekat-App/1.0'
-        ])
-        ->asForm()
-        ->post(
-            'https://overpass.kumi.systems/api/interpreter',
-            ['data' => $overpassQuery]
-        );
+            ->withHeaders([
+                'User-Agent' => 'Nearby-App/1.0'
+            ])
+            ->asForm()
+            ->post(
+                'https://overpass.kumi.systems/api/interpreter',
+                ['data' => $overpassQuery]
+            );
 
         if (!$response->successful()) {
             return response()->json([
                 'status' => false,
-                'error' => 'Overpass request failed',
-                'response_status' => $response->status(),
-                'body' => $response->body()
+                'error' => 'Overpass request failed'
             ]);
         }
 
         $elements = $response->json()['elements'] ?? [];
 
-        $hospitals = [];
+        $places = [];
 
         foreach ($elements as $element) {
 
-            $hospitalLat = $element['lat'] ?? $element['center']['lat'] ?? null;
-            $hospitalLng = $element['lon'] ?? $element['center']['lon'] ?? null;
+            $placeLat = $element['lat'] ?? $element['center']['lat'] ?? null;
+            $placeLng = $element['lon'] ?? $element['center']['lon'] ?? null;
 
-            if (!$hospitalLat || !$hospitalLng) {
-                continue;
-            }
+            if (!$placeLat || !$placeLng) continue;
 
             $name = $element['tags']['name'] ?? null;
+            if (!$name) continue;
 
-            if (!$name) {
-                continue;
-            }
+            $distance = $this->haversine($lat, $lng, $placeLat, $placeLng);
 
-            $distance = $this->haversine($lat, $lng, $hospitalLat, $hospitalLng);
-
-            $hospitals[] = [
+            $places[] = [
                 'name'        => $name,
+                'type'        => $type,
                 'address'     => $this->formatAddress($element['tags'] ?? []),
-                'latitude'    => $hospitalLat,
-                'longitude'   => $hospitalLng,
+                'latitude'    => $placeLat,
+                'longitude'   => $placeLng,
                 'distance_km' => round($distance, 2),
             ];
         }
 
-        // 🔥 Hapus duplikat berdasarkan nama
-        $hospitals = collect($hospitals)
+        $places = collect($places)
             ->unique('name')
+            ->sortBy('distance_km')
             ->values()
+            ->take(20)
             ->toArray();
-
-        // 🔥 Urutkan dari yang paling dekat
-        usort($hospitals, function ($a, $b) {
-            return $a['distance_km'] <=> $b['distance_km'];
-        });
-
-        // 🔥 Ambil 20 terdekat saja
-        $hospitals = array_slice($hospitals, 0, 20);
 
         return response()->json([
             'status' => true,
-            'user_location' => [
-                'latitude' => $lat,
-                'longitude' => $lng
-            ],
-            'total' => count($hospitals),
-            'data' => $hospitals
+            'total'  => count($places),
+            'data'   => $places
         ]);
     }
 
